@@ -95,7 +95,7 @@ export default function ResumenScreen() {
       const nueva: Completada = {
         id: uuid(),
         nombre: params.nombre!,
-        fecha: params.fecha!,
+        fecha: params.fecha!.split('T')[0],
         personas: personasNum,
         completos,
         precios,

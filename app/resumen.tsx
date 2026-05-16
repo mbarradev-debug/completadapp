@@ -36,6 +36,13 @@ function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2)
 }
 
+// useLocalSearchParams returns string | string[] at runtime despite the TypeScript generic.
+// This helper safely extracts a single string value, taking the last if it's an array.
+function getString(value: string | string[] | undefined, fallback = ''): string {
+  if (Array.isArray(value)) return value[value.length - 1] ?? fallback
+  return value ?? fallback
+}
+
 // ─── Shopping list ───────────────────────────────────────────────────────────
 
 type ListItem = { nombre: string; cantidad: string }
@@ -190,11 +197,11 @@ export default function ResumenScreen() {
     }
 
     // Creation mode: build and save
-    const nombre = params.nombre ?? ''
-    const fecha = params.fecha ?? new Date().toISOString()
-    const personas = parseInt(params.personas ?? '1', 10)
-    const tipo: TipoCompleto = params.tipo ?? 'italiano'
-    const precios: Record<string, number> = params.precios ? JSON.parse(params.precios) : {}
+    const nombre = getString(params.nombre)
+    const fecha = getString(params.fecha, new Date().toISOString())
+    const personas = parseInt(getString(params.personas, '1'), 10)
+    const tipo = getString(params.tipo, 'italiano') as TipoCompleto
+    const precios: Record<string, number> = JSON.parse(getString(params.precios, '{}'))
 
     const completos: CompletosPorTipo = {
       italiano: tipo === 'italiano' ? personas : 0,
@@ -280,6 +287,17 @@ export default function ResumenScreen() {
 
         {/* Toggle */}
         <TabToggle active={modo} onChange={setModo} />
+
+        {/* Colaborativo: per-person breakdown */}
+        {modo === 'colaborativo' && (
+          <View style={styles.aporteCard}>
+            <Text variant="Special/Category" style={styles.aporteLabel}>CADA PERSONA APORTA</Text>
+            <Text variant="Heading/H2" style={styles.aporteValor}>{formatCLP(porPersona)}</Text>
+            <Text variant="Body/XSmall" style={styles.aporteSub}>
+              {formatCLP(total)} total ÷ {personas} personas
+            </Text>
+          </View>
+        )}
 
         {/* Lista de compras */}
         <Text variant="Heading/H4" style={styles.listHeading}>{'🛒  Lista de compras'}</Text>
@@ -395,6 +413,27 @@ const styles = StyleSheet.create({
   },
   statValue: {
     color: colors.accent.mustardText,
+  },
+  // Colaborativo aporte card
+  aporteCard: {
+    backgroundColor: colors.brand.redLight,
+    borderWidth: 1.5,
+    borderColor: colors.brand.red,
+    borderRadius: 14,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    alignItems: 'center',
+    gap: 4,
+  },
+  aporteLabel: {
+    color: colors.brand.red,
+  },
+  aporteValor: {
+    color: colors.brand.red,
+  },
+  aporteSub: {
+    color: colors.neutral.gray,
+    marginTop: 2,
   },
   // Shopping list
   listHeading: {

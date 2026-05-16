@@ -19,19 +19,19 @@ const CARDS: {
     tipo: 'italiano',
     nombre: 'Italiano',
     descripcion: 'Con palta, tomate y mayonesa',
-    imagen: require('@/assets/images/completo-italiano.png'),
+    imagen: require('@/assets/images/completos/italiano.png'),
   },
   {
     tipo: 'dinamico',
     nombre: 'Dinámico',
     descripcion: 'Con chucrut, tomate, mayonesa y mostaza',
-    imagen: require('@/assets/images/completo-dinamico.png'),
+    imagen: require('@/assets/images/completos/dinamico.png'),
   },
   {
     tipo: 'americano',
     nombre: 'Americano',
     descripcion: 'Con ketchup, mostaza y mayonesa',
-    imagen: require('@/assets/images/completo-americano.png'),
+    imagen: require('@/assets/images/completos/americano.png'),
   },
 ]
 

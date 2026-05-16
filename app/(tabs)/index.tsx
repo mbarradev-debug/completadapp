@@ -206,6 +206,7 @@ const styles = StyleSheet.create({
   },
   emptyEmoji: {
     fontSize: 72,
+    lineHeight: 86,
   },
   emptyTitle: {
     color: colors.neutral.carbon,

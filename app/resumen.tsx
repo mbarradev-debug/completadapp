@@ -149,11 +149,15 @@ export default function ResumenScreen() {
             <Text variant="Special/Category" style={styles.statLabel}>TOTAL</Text>
             <Text variant="Heading/H2" style={styles.statValor}>{formatCLP(costoTotal)}</Text>
           </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text variant="Special/Category" style={styles.statLabel}>POR PERSONA</Text>
-            <Text variant="Heading/H2" style={styles.statValor}>{formatCLP(costoPorPersona)}</Text>
-          </View>
+          {modo === 'colaborativo' && (
+            <>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Text variant="Special/Category" style={styles.statLabel}>POR PERSONA</Text>
+                <Text variant="Heading/H2" style={styles.statValor}>{formatCLP(costoPorPersona)}</Text>
+              </View>
+            </>
+          )}
         </View>
 
         {/* Toggle Individual / Colaborativo */}

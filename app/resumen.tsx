@@ -10,6 +10,14 @@ import { colors } from '@/theme/colors'
 import { spacing } from '@/theme/spacing'
 import type { Completada, CompletosPorTipo, IngredientesCalculados, TipoCompleto } from '@/types'
 
+function uuid(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
 const WA_GREEN = '#25d366'
 const WA_GREEN_BG = '#e7fbe6'
 const WA_TEAL = '#128c7e'
@@ -85,7 +93,7 @@ export default function ResumenScreen() {
       }
       const ingredientes = calcularIngredientes(personasNum, completos)
       const nueva: Completada = {
-        id: crypto.randomUUID(),
+        id: uuid(),
         nombre: params.nombre!,
         fecha: params.fecha!,
         personas: personasNum,

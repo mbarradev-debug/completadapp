@@ -22,8 +22,17 @@ const TIPO_LABEL: Record<TipoCompleto, string> = {
 }
 
 function formatearFecha(fecha: string): string {
-  const [, mes, dia] = fecha.split('-').map(Number)
-  return `${dia} de ${MESES[mes - 1]}`
+  const d = new Date(fecha)
+  if (isNaN(d.getTime())) return 'Fecha no disponible'
+  return `${d.getDate()} de ${MESES[d.getMonth()]}`
+}
+
+// Defensive extraction: AsyncStorage data saved before the getString() fix may have
+// stored nombre as string[] if useLocalSearchParams returned an array at runtime.
+function extractNombre(value: string): string {
+  const raw = value as unknown as string | string[]
+  if (Array.isArray(raw)) return raw[raw.length - 1] ?? ''
+  return raw ?? ''
 }
 
 function getTipoLabel(completos: Completada['completos']): string {
@@ -35,6 +44,7 @@ function getTipoLabel(completos: Completada['completos']): string {
 
 export function CompletadaCard({ completada, onPress }: CompletadaCardProps) {
   const tipo = getTipoLabel(completada.completos)
+  const nombre = extractNombre(completada.nombre)
 
   return (
     <TouchableOpacity
@@ -43,7 +53,7 @@ export function CompletadaCard({ completada, onPress }: CompletadaCardProps) {
       activeOpacity={0.85}
     >
       <Text variant="Heading/H4" style={styles.nombre}>
-        {completada.nombre}
+        {nombre}
       </Text>
       <Text variant="Body/Small" style={styles.fecha}>
         {formatearFecha(completada.fecha)}

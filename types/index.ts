@@ -6,15 +6,17 @@ export interface CompletosPorTipo {
   americano: number
 }
 
+export type FormatoMayonesa = 'chico' | 'mediano' | 'grande'
+
 export interface IngredientesCalculados {
-  pan: number
-  salchicha: number
-  mayonesa: number
-  tomate: number
-  palta: number
-  chucrut: number
-  mostaza: number
-  ketchup: number
+  vienesas: { total: number; packsX5: number; packsX20: number }
+  pan: { total: number; packsX8: number }
+  palta: { aplica: boolean; mallas: number }
+  tomate: { aplica: boolean; unidades: number }
+  mayonesa: { formato: FormatoMayonesa; cantidad: number; recomendarUpgrade: boolean }
+  mostaza: { aplica: boolean; frascos: number }
+  ketchup: { aplica: boolean; frascos: number }
+  chucrut: { aplica: boolean; tarros: number }
 }
 
 export interface Completada {

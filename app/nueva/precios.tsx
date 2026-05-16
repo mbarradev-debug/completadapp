@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  KeyboardAvoidingView,
+  InputAccessoryView,
+  Keyboard,
   Modal,
   Platform,
   ScrollView,
@@ -65,7 +66,21 @@ export default function PreciosScreen() {
   const [precios, setPrecios] = useState<Record<string, number>>(preciosBase)
   const [editingKey, setEditingKey] = useState<string | null>(null)
   const [editingRaw, setEditingRaw] = useState('')
+  const [keyboardHeight, setKeyboardHeight] = useState(0)
   const inputRef = useRef<TextInput>(null)
+
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow'
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide'
+    const show = Keyboard.addListener(showEvent, (e) =>
+      setKeyboardHeight(e.endCoordinates.height),
+    )
+    const hide = Keyboard.addListener(hideEvent, () => setKeyboardHeight(0))
+    return () => {
+      show.remove()
+      hide.remove()
+    }
+  }, [])
 
   useEffect(() => {
     if (duplicarId) {
@@ -172,10 +187,7 @@ export default function PreciosScreen() {
         <TouchableWithoutFeedback onPress={confirmEdit}>
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'position' : 'height'}
-          style={styles.editSheet}
-        >
+        <View style={[styles.editSheet, { bottom: keyboardHeight }]}>
           <View style={styles.editCard}>
             <Text variant="Heading/H4" style={styles.editTitle}>
               {editingIngrediente?.label}
@@ -188,14 +200,17 @@ export default function PreciosScreen() {
               style={styles.editInput}
               value={editingRaw}
               onChangeText={setEditingRaw}
-              keyboardType="numeric"
+              keyboardType="number-pad"
               selectTextOnFocus
-              returnKeyType="done"
+              inputAccessoryViewID="precio-input"
               onSubmitEditing={confirmEdit}
             />
+            {Platform.OS === 'ios' && (
+              <InputAccessoryView nativeID="precio-input" />
+            )}
             <Button label="Listo" onPress={confirmEdit} />
           </View>
-        </KeyboardAvoidingView>
+        </View>
       </Modal>
     </View>
   )

@@ -1,98 +1,266 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { useCallback, useRef, useState } from 'react'
+import {
+  Animated,
+  FlatList,
+  Modal,
+  SafeAreaView,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native'
+import { useFocusEffect, useRouter } from 'expo-router'
+import { Button } from '@/components/button'
+import { CompletadaCard } from '@/components/completada-card'
+import { Text } from '@/components/text'
+import { listarCompletadas } from '@/lib/storage'
+import { colors } from '@/theme/colors'
+import { radius } from '@/theme/radius'
+import { spacing } from '@/theme/spacing'
+import type { Completada } from '@/types'
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const router = useRouter()
+  const [completadas, setCompletadas] = useState<Completada[]>([])
+  const [selected, setSelected] = useState<Completada | null>(null)
+  const slideAnim = useRef(new Animated.Value(300)).current
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+  useFocusEffect(
+    useCallback(() => {
+      listarCompletadas().then(setCompletadas)
+    }, []),
+  )
+
+  function openSheet(completada: Completada) {
+    setSelected(completada)
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 280,
+      useNativeDriver: true,
+    }).start()
+  }
+
+  function closeSheet(callback?: () => void) {
+    Animated.timing(slideAnim, {
+      toValue: 300,
+      duration: 220,
+      useNativeDriver: true,
+    }).start(() => {
+      setSelected(null)
+      slideAnim.setValue(300)
+      callback?.()
+    })
+  }
+
+  return (
+    <View style={styles.container}>
+      {/* Navbar */}
+      <View style={styles.navbar}>
+        <SafeAreaView>
+          <Text variant="Display/Logo" style={styles.logo}>
+            Completadapp
+          </Text>
+        </SafeAreaView>
+      </View>
+
+      {/* Content */}
+      <View style={styles.content}>
+        {completadas.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <FlatList
+            data={completadas}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <CompletadaCard completada={item} onPress={openSheet} />
+            )}
+            contentContainerStyle={styles.list}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+      </View>
+
+      {/* Footer CTA */}
+      <View style={styles.footer}>
+        <Button
+          label="+ Nueva completada"
+          onPress={() => router.push('/nueva/nombre')}
+        />
+      </View>
+
+      {/* Bottom Sheet */}
+      <Modal
+        visible={selected !== null}
+        transparent
+        animationType="none"
+        onRequestClose={() => closeSheet()}
+      >
+        <TouchableWithoutFeedback onPress={() => closeSheet()}>
+          <View style={styles.overlay} />
+        </TouchableWithoutFeedback>
+
+        <Animated.View
+          style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}
+        >
+          <View style={styles.dragHandle} />
+
+          <TouchableOpacity
+            style={styles.sheetRow}
+            activeOpacity={0.7}
+            onPress={() => closeSheet(() => router.push(`/resumen?id=${selected?.id}`))}
+          >
+            <Text variant="Body/Regular" style={styles.sheetRowText}>
+              Ver resumen
+            </Text>
+            <Text variant="Body/Regular" style={styles.chevron}>›</Text>
+          </TouchableOpacity>
+
+          <View style={styles.separator} />
+
+          <TouchableOpacity
+            style={styles.sheetRow}
+            activeOpacity={0.7}
+            onPress={() => closeSheet(() => router.push(`/nueva/nombre?duplicarId=${selected?.id}`))}
+          >
+            <Text variant="Body/Regular" style={styles.sheetRowText}>
+              Duplicar
+            </Text>
+            <Text variant="Body/Regular" style={styles.chevron}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.cancelRow}
+            activeOpacity={0.7}
+            onPress={() => closeSheet()}
+          >
+            <Text variant="Action/Button" style={styles.cancelText}>
+              Cancelar
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </Modal>
+    </View>
+  )
+}
+
+function EmptyState() {
+  return (
+    <View style={styles.emptyState}>
+      <View style={styles.emptyIllustration}>
+        <Text style={styles.emptyEmoji}>🌭</Text>
+      </View>
+      <Text variant="Heading/H2" style={styles.emptyTitle}>
+        ¡Todo listo para tu próxima completada!
+      </Text>
+      <Text variant="Body/Regular" style={styles.emptySubtitle}>
+        Aquí verás el historial de tus completadas una vez que crees la primera.
+      </Text>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    backgroundColor: colors.neutral.cream,
+  },
+  navbar: {
+    backgroundColor: colors.brand.red,
+    paddingHorizontal: spacing['2xl'],
+    paddingBottom: spacing.lg,
+  },
+  logo: {
+    color: colors.neutral.white,
+    paddingTop: spacing.lg,
+  },
+  content: {
+    flex: 1,
+  },
+  list: {
+    padding: spacing['2xl'],
+    gap: spacing.md,
+  },
+  footer: {
+    paddingHorizontal: spacing['2xl'],
+    paddingBottom: spacing['2xl'],
+    paddingTop: spacing.lg,
+    backgroundColor: colors.neutral.cream,
+  },
+  // Empty state
+  emptyState: {
+    flex: 1,
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
+    paddingHorizontal: spacing['2xl'],
+    gap: spacing.xl,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  emptyIllustration: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: colors.neutral.sandLight,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
+  emptyEmoji: {
+    fontSize: 72,
+  },
+  emptyTitle: {
+    color: colors.neutral.carbon,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    color: colors.neutral.gray,
+    textAlign: 'center',
+  },
+  // Bottom sheet
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(26,26,26,0.5)',
+  },
+  sheet: {
+    position: 'absolute',
     bottom: 0,
     left: 0,
-    position: 'absolute',
+    right: 0,
+    height: 244,
+    backgroundColor: colors.neutral.cream,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: spacing.md,
+    paddingHorizontal: spacing['2xl'],
+    paddingBottom: spacing['2xl'],
   },
-});
+  dragHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: colors.neutral.sand,
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginBottom: spacing.lg,
+  },
+  sheetRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.lg,
+  },
+  sheetRowText: {
+    color: colors.neutral.carbon,
+  },
+  chevron: {
+    color: colors.neutral.gray,
+    fontSize: 20,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: colors.neutral.sand,
+  },
+  cancelRow: {
+    alignItems: 'center',
+    paddingTop: spacing.xl,
+  },
+  cancelText: {
+    color: colors.brand.red,
+  },
+})

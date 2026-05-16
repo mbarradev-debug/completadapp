@@ -3,24 +3,24 @@ import {
   Animated,
   FlatList,
   Modal,
-  SafeAreaView,
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { Button } from '@/components/button'
 import { CompletadaCard } from '@/components/completada-card'
 import { Text } from '@/components/text'
 import { listarCompletadas } from '@/lib/storage'
 import { colors } from '@/theme/colors'
-import { radius } from '@/theme/radius'
 import { spacing } from '@/theme/spacing'
 import type { Completada } from '@/types'
 
 export default function HomeScreen() {
   const router = useRouter()
+  const insets = useSafeAreaInsets()
   const [completadas, setCompletadas] = useState<Completada[]>([])
   const [selected, setSelected] = useState<Completada | null>(null)
   const slideAnim = useRef(new Animated.Value(300)).current
@@ -55,12 +55,12 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       {/* Navbar */}
-      <View style={styles.navbar}>
-        <SafeAreaView>
+      <View style={[styles.navbar, { paddingTop: insets.top }]}>
+        <View style={styles.navbarContent}>
           <Text variant="Display/Logo" style={styles.logo}>
             Completadapp
           </Text>
-        </SafeAreaView>
+        </View>
       </View>
 
       {/* Content */}
@@ -166,12 +166,14 @@ const styles = StyleSheet.create({
   },
   navbar: {
     backgroundColor: colors.brand.red,
-    paddingHorizontal: spacing['2xl'],
-    paddingBottom: spacing.lg,
+  },
+  navbarContent: {
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   logo: {
     color: colors.neutral.white,
-    paddingTop: spacing.lg,
   },
   content: {
     flex: 1,

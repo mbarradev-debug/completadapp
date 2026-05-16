@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
+  InputAccessoryView,
   Keyboard,
   Modal,
   Platform,
@@ -199,11 +200,14 @@ export default function PreciosScreen() {
               style={styles.editInput}
               value={editingRaw}
               onChangeText={setEditingRaw}
-              keyboardType="numeric"
+              keyboardType="number-pad"
               selectTextOnFocus
-              returnKeyType="done"
+              inputAccessoryViewID="precio-input"
               onSubmitEditing={confirmEdit}
             />
+            {Platform.OS === 'ios' && (
+              <InputAccessoryView nativeID="precio-input" />
+            )}
             <Button label="Listo" onPress={confirmEdit} />
           </View>
         </View>

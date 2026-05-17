@@ -39,12 +39,15 @@ function buildLineas(ingredientes: IngredientesCalculados): string[] {
   return ls
 }
 
-export function generarMensajeWhatsApp(completada: Completada): string {
+export function generarMensajeWhatsApp(completada: Completada, modo: 'individual' | 'colaborativo'): string {
   const { nombre, fecha, personas, completos, ingredientes, precios } = completada
   const tipo = completos.italiano > 0 ? 'Italiano' : completos.dinamico > 0 ? 'Dinámico' : 'Americano'
   const costoTotal = calcularCostoTotal(ingredientes, precios)
   const costoPorPersona = Math.ceil(costoTotal / personas)
   const lista = buildLineas(ingredientes).join('\n')
+  const lineaCosto = modo === 'colaborativo'
+    ? `💰 *Total: ${formatCLP(costoTotal)}*  ·  ${formatCLP(costoPorPersona)} por persona`
+    : `💰 *Total: ${formatCLP(costoTotal)}*`
   return [
     `🌭 *${nombre}*`,
     `📅 ${formatFecha(fecha)}  |  👥 ${personas} personas  |  ${tipo}`,
@@ -52,13 +55,13 @@ export function generarMensajeWhatsApp(completada: Completada): string {
     '🛒 *Lista de compras*',
     lista,
     '',
-    `💰 *Total: ${formatCLP(costoTotal)}*  ·  ${formatCLP(costoPorPersona)} por persona`,
+    lineaCosto,
     '',
     '¿Tú organizas el próximo? → completadapp.cl',
   ].join('\n')
 }
 
-export function compartirPorWhatsApp(completada: Completada): void {
-  const texto = generarMensajeWhatsApp(completada)
+export function compartirPorWhatsApp(completada: Completada, modo: 'individual' | 'colaborativo'): void {
+  const texto = generarMensajeWhatsApp(completada, modo)
   Linking.openURL(`https://wa.me/?text=${encodeURIComponent(texto)}`)
 }

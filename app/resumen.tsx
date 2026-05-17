@@ -209,7 +209,7 @@ export default function ResumenScreen() {
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.xl) }]}>
         <TouchableOpacity
           style={styles.waButton}
-          onPress={() => compartirPorWhatsApp(completada, modo)}
+          onPress={() => void compartirPorWhatsApp(completada, modo)}
           activeOpacity={0.85}
         >
           <Text style={styles.waButtonLabel}>Compartir por WhatsApp</Text>

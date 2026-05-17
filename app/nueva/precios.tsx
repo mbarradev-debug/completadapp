@@ -97,17 +97,31 @@ export default function PreciosScreen() {
   const [precios, setPrecios] = useState<Record<string, number>>(() => preciosBase(formatoMayo))
   const [editingKey, setEditingKey] = useState<string | null>(null)
   const [editingRaw, setEditingRaw] = useState('')
-  const [keyboardHeight, setKeyboardHeight] = useState(0)
   const inputRef = useRef<TextInput>(null)
   const slideAnim = useRef(new Animated.Value(320)).current
+  const bottomAnim = useRef(new Animated.Value(0)).current
 
   useEffect(() => {
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow'
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide'
-    const show = Keyboard.addListener(showEvent, (e) =>
-      setKeyboardHeight(e.endCoordinates.height),
+    const show = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        Animated.timing(bottomAnim, {
+          toValue: e.endCoordinates.height,
+          duration: Platform.OS === 'ios' ? (e.duration ?? 250) : 0,
+          useNativeDriver: false,
+        }).start()
+      },
     )
-    const hide = Keyboard.addListener(hideEvent, () => setKeyboardHeight(0))
+    const hide = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      (e) => {
+        Animated.timing(bottomAnim, {
+          toValue: 0,
+          duration: Platform.OS === 'ios' ? (e.duration ?? 250) : 0,
+          useNativeDriver: false,
+        }).start()
+      },
+    )
     return () => {
       show.remove()
       hide.remove()
@@ -236,7 +250,7 @@ export default function PreciosScreen() {
         <TouchableWithoutFeedback onPress={confirmEdit}>
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
-        <View style={[styles.editSheet, { bottom: Platform.OS === 'ios' ? keyboardHeight : 0 }]}>
+        <Animated.View style={[styles.editSheet, { bottom: bottomAnim }]}>
           <Animated.View style={[styles.editCard, { transform: [{ translateY: slideAnim }] }]}>
             <Text variant="Heading/H4" style={styles.editTitle}>
               {editingIngrediente?.label}
@@ -259,7 +273,7 @@ export default function PreciosScreen() {
             )}
             <Button label="Listo" onPress={confirmEdit} />
           </Animated.View>
-        </View>
+        </Animated.View>
       </Modal>
     </View>
   )

@@ -29,7 +29,7 @@ function conMargen(n: number): number {
 
 function aplicarMinimo(personas: number, completos: CompletosPorTipo): CompletosPorTipo {
   const total = completos.italiano + completos.dinamico + completos.americano
-  const minTotal = personas * 2
+  const minTotal = personas
   if (total >= minTotal) return completos
   if (total === 0) return { italiano: minTotal, dinamico: 0, americano: 0 }
   const factor = minTotal / total

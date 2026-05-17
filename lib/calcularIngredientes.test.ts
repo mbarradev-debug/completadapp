@@ -1,26 +1,25 @@
 import { calcularIngredientes } from './calcularIngredientes'
 
 // ─── DBO-119 · Caso 1 — 10 personas, Italiano puro ───────────────────────────
-// aplicarMinimo: total=10 < minTotal=20 → escala a {italiano:20}
-// conMargen: ceil(20×1.1) = 22 completos
+// minTotal=10 = total → sin escalar → conMargen(10) = 11 completos
 
 describe('DBO-119 · Caso 1 — 10 personas, Italiano puro', () => {
   const r = calcularIngredientes(10, { italiano: 10, dinamico: 0, americano: 0 })
 
-  test('vienesas: 5 packs x5, 2 packs x20', () => {
-    expect(r.vienesas).toEqual({ total: 22, packsX5: 5, packsX20: 2 })
+  test('vienesas: 3 packs x5, 1 pack x20', () => {
+    expect(r.vienesas).toEqual({ total: 11, packsX5: 3, packsX20: 1 })
   })
-  test('pan: 3 packs x8', () => {
-    expect(r.pan).toEqual({ total: 22, packsX8: 3 })
+  test('pan: 2 packs x8', () => {
+    expect(r.pan).toEqual({ total: 11, packsX8: 2 })
   })
-  test('palta: 3 mallas (22 × 70g = 1540g → ceil(1540/700) = 3)', () => {
-    expect(r.palta).toEqual({ aplica: true, mallas: 3 })
+  test('palta: 2 mallas (11 × 70g = 770g → ceil(770/700) = 2)', () => {
+    expect(r.palta).toEqual({ aplica: true, mallas: 2 })
   })
-  test('tomate: 7 unidades (22 × 40g = 880g → ceil(880/140) = 7)', () => {
-    expect(r.tomate).toEqual({ aplica: true, unidades: 7 })
+  test('tomate: 4 unidades (11 × 40g = 440g → ceil(440/140) = 4)', () => {
+    expect(r.tomate).toEqual({ aplica: true, unidades: 4 })
   })
-  test('mayonesa: 1 frasco grande (22 × 50g = 1100g > 789g)', () => {
-    expect(r.mayonesa.formato).toBe('grande')
+  test('mayonesa: 1 frasco mediano (11 × 50g = 550g, 394 < 550 ≤ 789)', () => {
+    expect(r.mayonesa.formato).toBe('mediano')
     expect(r.mayonesa.cantidad).toBe(1)
   })
   test('mostaza, ketchup, chucrut: no aplican', () => {
@@ -31,25 +30,24 @@ describe('DBO-119 · Caso 1 — 10 personas, Italiano puro', () => {
 })
 
 // ─── DBO-119 · Caso 2 — 1 persona, Americano ─────────────────────────────────
-// aplicarMinimo: total=1 < minTotal=2 → escala a {americano:2}
-// conMargen: ceil(2×1.1) = 3 completos
+// minTotal=1 = total → sin escalar → conMargen(1) = 2 completos
 
-describe('DBO-119 · Caso 2 — 1 persona, Americano (mínimo 2/persona)', () => {
+describe('DBO-119 · Caso 2 — 1 persona, Americano', () => {
   const r = calcularIngredientes(1, { italiano: 0, dinamico: 0, americano: 1 })
 
-  test('aplica mínimo: 3 completos post-margen (ceil(2×1.1))', () => {
-    expect(r.vienesas.total).toBe(3)
+  test('2 completos post-margen (ceil(1×1.1))', () => {
+    expect(r.vienesas.total).toBe(2)
   })
   test('vienesas: 1 pack x5', () => expect(r.vienesas.packsX5).toBe(1))
   test('pan: 1 pack x8', () => expect(r.pan.packsX8).toBe(1))
-  test('mayonesa: chico (3 × 25g = 75g ≤ 394g)', () => {
+  test('mayonesa: chico (2 × 25g = 50g ≤ 394g)', () => {
     expect(r.mayonesa.formato).toBe('chico')
     expect(r.mayonesa.cantidad).toBe(1)
   })
-  test('ketchup: 1 frasco (3 × 20g = 60g → ceil(60/400) = 1)', () => {
+  test('ketchup: 1 frasco (2 × 20g = 40g → ceil(40/400) = 1)', () => {
     expect(r.ketchup).toEqual({ aplica: true, frascos: 1 })
   })
-  test('mostaza: 1 frasco (3 × 10g = 30g → ceil(30/200) = 1)', () => {
+  test('mostaza: 1 frasco (2 × 10g = 20g → ceil(20/200) = 1)', () => {
     expect(r.mostaza).toEqual({ aplica: true, frascos: 1 })
   })
   test('palta y chucrut no aplican', () => {
@@ -59,20 +57,19 @@ describe('DBO-119 · Caso 2 — 1 persona, Americano (mínimo 2/persona)', () =>
 })
 
 // ─── DBO-119 · Caso 3 — 50 personas, Dinámico puro ───────────────────────────
-// aplicarMinimo: total=50 < minTotal=100 → escala a {dinamico:100}
-// conMargen: ceil(100×1.1) = 110 completos
+// minTotal=50 = total → sin escalar → conMargen(50) = 55 completos
 
-describe('DBO-119 · Caso 3 — 50 personas, Dinámico puro (sin overflow)', () => {
+describe('DBO-119 · Caso 3 — 50 personas, Dinámico puro', () => {
   const r = calcularIngredientes(50, { italiano: 0, dinamico: 50, americano: 0 })
 
-  test('vienesas: 22 packs x5 (ceil(110/5))', () => expect(r.vienesas.packsX5).toBe(22))
-  test('pan: 14 packs x8 (ceil(110/8))', () => expect(r.pan.packsX8).toBe(14))
-  test('chucrut: 11 tarros (110 × 40g = 4400g → ceil(4400/400) = 11)', () => {
-    expect(r.chucrut).toEqual({ aplica: true, tarros: 11 })
+  test('vienesas: 11 packs x5 (ceil(55/5))', () => expect(r.vienesas.packsX5).toBe(11))
+  test('pan: 7 packs x8 (ceil(55/8))', () => expect(r.pan.packsX8).toBe(7))
+  test('chucrut: 6 tarros (55 × 40g = 2200g → ceil(2200/400) = 6)', () => {
+    expect(r.chucrut).toEqual({ aplica: true, tarros: 6 })
   })
-  test('mayonesa: 3 frascos grandes (110 × 30g = 3300g → ceil(3300/1262) = 3)', () => {
+  test('mayonesa: 2 frascos grandes (55 × 30g = 1650g → ceil(1650/1262) = 2)', () => {
     expect(r.mayonesa.formato).toBe('grande')
-    expect(r.mayonesa.cantidad).toBe(3)
+    expect(r.mayonesa.cantidad).toBe(2)
   })
   test('palta y ketchup no aplican', () => {
     expect(r.palta.aplica).toBe(false)
@@ -81,30 +78,30 @@ describe('DBO-119 · Caso 3 — 50 personas, Dinámico puro (sin overflow)', () 
 })
 
 // ─── DBO-119 · Caso 4 — Mixto (10 personas) ──────────────────────────────────
-// aplicarMinimo: total=10 < minTotal=20 → factor=2 → {italiano:10, dinamico:6, americano:4}
-// conMargen: italiano=11, dinamico=7, americano=5 → totalCompletos=23
+// total=10 = minTotal → sin escalar
+// italiano=ceil(5.5)=6, dinamico=ceil(3.3)=4, americano=ceil(2.2)=3 → totalCompletos=13
 
 describe('DBO-119 · Caso 4 — Mixto: 5 Italiano, 3 Dinámico, 2 Americano (10 personas)', () => {
   const r = calcularIngredientes(10, { italiano: 5, dinamico: 3, americano: 2 })
 
-  test('vienesas: 5 packs x5 (ceil(23/5) = 5)', () => expect(r.vienesas.packsX5).toBe(5))
-  test('palta: 2 mallas (11 × 70g = 770g → ceil(770/700) = 2)', () => {
-    expect(r.palta).toEqual({ aplica: true, mallas: 2 })
+  test('vienesas: 3 packs x5 (ceil(13/5) = 3)', () => expect(r.vienesas.packsX5).toBe(3))
+  test('palta: 1 malla (6 × 70g = 420g → ceil(420/700) = 1)', () => {
+    expect(r.palta).toEqual({ aplica: true, mallas: 1 })
   })
-  test('tomate: 6 unidades ((11+7) × 40g = 720g → ceil(720/140) = 6)', () => {
-    expect(r.tomate).toEqual({ aplica: true, unidades: 6 })
+  test('tomate: 3 unidades ((6+4) × 40g = 400g → ceil(400/140) = 3)', () => {
+    expect(r.tomate).toEqual({ aplica: true, unidades: 3 })
   })
-  test('mayonesa: 1 frasco grande (11×50 + 7×30 + 5×25 = 885g ≤ 1262g)', () => {
-    expect(r.mayonesa.formato).toBe('grande')
+  test('mayonesa: 1 frasco mediano (6×50 + 4×30 + 3×25 = 495g, 394 < 495 ≤ 789)', () => {
+    expect(r.mayonesa.formato).toBe('mediano')
     expect(r.mayonesa.cantidad).toBe(1)
   })
-  test('mostaza: 1 frasco ((7+5) × 10g = 120g → ceil(120/200) = 1)', () => {
+  test('mostaza: 1 frasco ((4+3) × 10g = 70g → ceil(70/200) = 1)', () => {
     expect(r.mostaza).toEqual({ aplica: true, frascos: 1 })
   })
-  test('ketchup: 1 frasco (5 × 20g = 100g → ceil(100/400) = 1)', () => {
+  test('ketchup: 1 frasco (3 × 20g = 60g → ceil(60/400) = 1)', () => {
     expect(r.ketchup).toEqual({ aplica: true, frascos: 1 })
   })
-  test('chucrut: 1 tarro (7 × 40g = 280g → ceil(280/400) = 1)', () => {
+  test('chucrut: 1 tarro (4 × 40g = 160g → ceil(160/400) = 1)', () => {
     expect(r.chucrut).toEqual({ aplica: true, tarros: 1 })
   })
 })
@@ -122,27 +119,27 @@ describe('DBO-119 · Caso 5 — Costo por persona (ceil)', () => {
 // ─── Casos borde adicionales ──────────────────────────────────────────────────
 
 describe('caso borde: solo dinámico (8 personas)', () => {
-  // dinamico=8, min=16 → escala a 16; ceil(16×1.1) = 18
+  // dinamico=8, min=8 → sin escalar; conMargen(8) = ceil(8.8) = 9
   const r = calcularIngredientes(8, { italiano: 0, dinamico: 8, americano: 0 })
 
   test('palta y ketchup no aplican', () => {
     expect(r.palta.aplica).toBe(false)
     expect(r.ketchup.aplica).toBe(false)
   })
-  test('chucrut: 2 tarros (ceil(18×40/400) = ceil(1.8) = 2)', () => {
-    expect(r.chucrut).toEqual({ aplica: true, tarros: 2 })
+  test('chucrut: 1 tarro (9 × 40g = 360g → ceil(360/400) = 1)', () => {
+    expect(r.chucrut).toEqual({ aplica: true, tarros: 1 })
   })
-  test('tomate: 6 unidades (ceil(18×40/140) = ceil(5.14) = 6)', () => {
-    expect(r.tomate).toEqual({ aplica: true, unidades: 6 })
+  test('tomate: 3 unidades (9 × 40g = 360g → ceil(360/140) = 3)', () => {
+    expect(r.tomate).toEqual({ aplica: true, unidades: 3 })
   })
-  test('mayonesa: mediano (18 × 30g = 540g → 394 < 540 ≤ 789)', () => {
-    expect(r.mayonesa.formato).toBe('mediano')
+  test('mayonesa: chico (9 × 30g = 270g ≤ 394g)', () => {
+    expect(r.mayonesa.formato).toBe('chico')
     expect(r.mayonesa.cantidad).toBe(1)
   })
 })
 
 describe('caso borde: solo americano (5 personas)', () => {
-  // americano=5, min=10 → escala a 10; ceil(10×1.1) = 11
+  // americano=5, min=5 → sin escalar; conMargen(5) = ceil(5.5) = 6
   const r = calcularIngredientes(5, { italiano: 0, dinamico: 0, americano: 5 })
 
   test('palta, chucrut, tomate no aplican', () => {
@@ -150,19 +147,19 @@ describe('caso borde: solo americano (5 personas)', () => {
     expect(r.chucrut.aplica).toBe(false)
     expect(r.tomate.aplica).toBe(false)
   })
-  test('ketchup: 1 frasco (ceil(11×20/400) = 1)', () => {
+  test('ketchup: 1 frasco (ceil(6×20/400) = 1)', () => {
     expect(r.ketchup).toEqual({ aplica: true, frascos: 1 })
   })
-  test('mostaza: 1 frasco (ceil(11×10/200) = 1)', () => {
+  test('mostaza: 1 frasco (ceil(6×10/200) = 1)', () => {
     expect(r.mostaza).toEqual({ aplica: true, frascos: 1 })
   })
-  test('mayonesa: chico (11 × 25g = 275g ≤ 394g)', () => {
+  test('mayonesa: chico (6 × 25g = 150g ≤ 394g)', () => {
     expect(r.mayonesa.formato).toBe('chico')
   })
 })
 
 describe('selección de frasco de mayonesa', () => {
-  test('chico: 2 personas italiano → 4 compl → 4×50g=200g ≤ 394g', () => {
+  test('chico: 2 personas italiano → 3 compl → 3×50g=150g ≤ 394g', () => {
     const r = calcularIngredientes(2, { italiano: 2, dinamico: 0, americano: 0 })
     expect(r.mayonesa.formato).toBe('chico')
     expect(r.mayonesa.recomendarUpgrade).toBe(false)
@@ -171,9 +168,9 @@ describe('selección de frasco de mayonesa', () => {
     const r = calcularIngredientes(10, { italiano: 10, dinamico: 0, americano: 0 })
     expect(r.mayonesa.recomendarUpgrade).toBe(true)
   })
-  test('grande × múltiples frascos: 30p italiano → 66 compl → 66×50=3300g → 3 frascos', () => {
+  test('grande × múltiples frascos: 30p italiano → 33 compl → 33×50=1650g → ceil(1650/1262) = 2 frascos', () => {
     const r = calcularIngredientes(30, { italiano: 30, dinamico: 0, americano: 0 })
     expect(r.mayonesa.formato).toBe('grande')
-    expect(r.mayonesa.cantidad).toBe(3)
+    expect(r.mayonesa.cantidad).toBe(2)
   })
 })

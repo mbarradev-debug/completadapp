@@ -17,7 +17,7 @@ function calcularCostoTotal(ingredientes: IngredientesCalculados, precios: Recor
   let t = vienesas.packsX5 * (precios.vienesas ?? 0)
   t += pan.packsX8 * (precios.pan ?? 0)
   if (palta.aplica) t += palta.mallas * (precios.palta ?? 0)
-  if (tomate.aplica) t += tomate.unidades * (precios.tomate ?? 0)
+  if (tomate.aplica) t += Math.ceil(tomate.unidades * 140 / 1000) * (precios.tomate ?? 0)
   t += mayonesa.cantidad * (precios.mayonesa ?? 0)
   if (mostaza.aplica) t += mostaza.frascos * (precios.mostaza ?? 0)
   if (ketchup.aplica) t += ketchup.frascos * (precios.ketchup ?? 0)

@@ -187,7 +187,7 @@ export default function PreciosScreen() {
         <TouchableWithoutFeedback onPress={confirmEdit}>
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
-        <View style={[styles.editSheet, { bottom: keyboardHeight }]}>
+        <View style={[styles.editSheet, { bottom: Platform.OS === 'ios' ? keyboardHeight : 0 }]}>
           <View style={styles.editCard}>
             <Text variant="Heading/H4" style={styles.editTitle}>
               {editingIngrediente?.label}

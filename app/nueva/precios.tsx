@@ -18,17 +18,30 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Button } from '@/components/button'
 import { ProgressStepper } from '@/components/progress-stepper'
 import { Text } from '@/components/text'
+import { calcularIngredientes } from '@/lib/calcularIngredientes'
 import { obtenerCompletada } from '@/lib/storage'
 import { colors } from '@/theme/colors'
 import { radius } from '@/theme/radius'
 import { spacing } from '@/theme/spacing'
-import type { TipoCompleto } from '@/types'
+import type { FormatoMayonesa, TipoCompleto } from '@/types'
 
 function formatCLP(value: number): string {
   return '$' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 }
 
-const INGREDIENTES: {
+const MAYO_PRECIOS: Record<FormatoMayonesa, number> = {
+  chico: 5590,
+  mediano: 6590,
+  grande: 9390,
+}
+
+const MAYO_LABELS: Record<FormatoMayonesa, string> = {
+  chico: 'Mayonesa Kraft (chico 394g)',
+  mediano: 'Mayonesa Kraft (mediano 789g)',
+  grande: 'Mayonesa Kraft (grande 1262g)',
+}
+
+const INGREDIENTES_BASE: {
   key: string
   label: string
   unidad: string
@@ -50,8 +63,18 @@ const VISIBLES_POR_TIPO: Record<TipoCompleto, string[]> = {
   americano: ['vienesas', 'pan', 'ketchup', 'mostaza', 'mayonesa'],
 }
 
-function preciosBase(): Record<string, number> {
-  return Object.fromEntries(INGREDIENTES.map((i) => [i.key, i.precioBase]))
+function preciosBase(formatoMayo: FormatoMayonesa): Record<string, number> {
+  return Object.fromEntries(
+    INGREDIENTES_BASE.map((i) => [i.key, i.key === 'mayonesa' ? MAYO_PRECIOS[formatoMayo] : i.precioBase])
+  )
+}
+
+function resolverFormatoMayo(personasNum: number, tipo: TipoCompleto): FormatoMayonesa {
+  return calcularIngredientes(personasNum, {
+    italiano: tipo === 'italiano' ? personasNum : 0,
+    dinamico: tipo === 'dinamico' ? personasNum : 0,
+    americano: tipo === 'americano' ? personasNum : 0,
+  }).mayonesa.formato
 }
 
 export default function PreciosScreen() {
@@ -65,7 +88,15 @@ export default function PreciosScreen() {
     duplicarId?: string
   }>()
 
-  const [precios, setPrecios] = useState<Record<string, number>>(preciosBase)
+  const personasNum = parseInt(personas || '1', 10)
+  const formatoMayo = resolverFormatoMayo(personasNum, tipo)
+  const ingredientes = INGREDIENTES_BASE.map((i) =>
+    i.key === 'mayonesa'
+      ? { ...i, label: MAYO_LABELS[formatoMayo], precioBase: MAYO_PRECIOS[formatoMayo] }
+      : i
+  )
+
+  const [precios, setPrecios] = useState<Record<string, number>>(() => preciosBase(formatoMayo))
   const [editingKey, setEditingKey] = useState<string | null>(null)
   const [editingRaw, setEditingRaw] = useState('')
   const [keyboardHeight, setKeyboardHeight] = useState(0)
@@ -88,13 +119,13 @@ export default function PreciosScreen() {
   useEffect(() => {
     if (duplicarId) {
       obtenerCompletada(duplicarId).then((c) => {
-        if (c?.precios) setPrecios({ ...preciosBase(), ...c.precios })
+        if (c?.precios) setPrecios({ ...preciosBase(formatoMayo), ...c.precios })
       })
     }
   }, [duplicarId])
 
   const visibles = VISIBLES_POR_TIPO[tipo] ?? []
-  const filas = INGREDIENTES.filter((i) => visibles.includes(i.key))
+  const filas = ingredientes.filter((i) => visibles.includes(i.key))
 
   function openEdit(key: string) {
     setEditingKey(key)
@@ -138,7 +169,7 @@ export default function PreciosScreen() {
     })
   }
 
-  const editingIngrediente = INGREDIENTES.find((i) => i.key === editingKey)
+  const editingIngrediente = ingredientes.find((i) => i.key === editingKey)
 
   return (
     <View style={styles.root}>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   Animated,
+  Easing,
   InputAccessoryView,
   Keyboard,
   Modal,
@@ -69,7 +70,7 @@ export default function PreciosScreen() {
   const [editingRaw, setEditingRaw] = useState('')
   const [keyboardHeight, setKeyboardHeight] = useState(0)
   const inputRef = useRef<TextInput>(null)
-  const slideAnim = useRef(new Animated.Value(500)).current
+  const slideAnim = useRef(new Animated.Value(320)).current
 
   useEffect(() => {
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow'
@@ -98,7 +99,12 @@ export default function PreciosScreen() {
   function openEdit(key: string) {
     setEditingKey(key)
     setEditingRaw(String(precios[key]))
-    Animated.spring(slideAnim, { toValue: 0, bounciness: 4, useNativeDriver: true }).start()
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 340,
+      easing: Easing.out(Easing.exp),
+      useNativeDriver: true,
+    }).start()
     setTimeout(() => inputRef.current?.focus(), 80)
   }
 
@@ -107,8 +113,13 @@ export default function PreciosScreen() {
     if (!isNaN(parsed) && parsed > 0 && editingKey) {
       setPrecios((p) => ({ ...p, [editingKey]: parsed }))
     }
-    Animated.timing(slideAnim, { toValue: 500, duration: 220, useNativeDriver: true }).start(() => {
-      slideAnim.setValue(500)
+    Animated.timing(slideAnim, {
+      toValue: 320,
+      duration: 260,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(() => {
+      slideAnim.setValue(320)
       setEditingKey(null)
     })
   }

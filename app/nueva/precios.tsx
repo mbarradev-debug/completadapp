@@ -19,6 +19,7 @@ import { Button } from '@/components/button'
 import { ProgressStepper } from '@/components/progress-stepper'
 import { Text } from '@/components/text'
 import { calcularIngredientes } from '@/lib/calcularIngredientes'
+import { DEFAULT_PRICES, loadPrices, savePrices } from '@/lib/defaultPrices'
 import { obtenerCompletada } from '@/lib/storage'
 import { colors } from '@/theme/colors'
 import { radius } from '@/theme/radius'
@@ -63,9 +64,7 @@ const VISIBLES_POR_TIPO: Record<TipoCompleto, string[]> = {
 }
 
 function preciosBase(formatoMayo: FormatoMayonesa): Record<string, number> {
-  return Object.fromEntries(
-    INGREDIENTES_BASE.map((i) => [i.key, i.key === 'mayonesa' ? MAYO_PRECIOS[formatoMayo] : i.precioBase])
-  )
+  return { ...DEFAULT_PRICES, mayonesa: MAYO_PRECIOS[formatoMayo] }
 }
 
 function resolverFormatoMayo(personasNum: number, tipo: TipoCompleto): FormatoMayonesa {

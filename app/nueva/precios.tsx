@@ -18,6 +18,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Button } from '@/components/button'
 import { ProgressStepper } from '@/components/progress-stepper'
 import { Text } from '@/components/text'
+import { DEFAULT_PRICES, loadPrices, savePrices } from '@/lib/defaultPrices'
 import { obtenerCompletada } from '@/lib/storage'
 import { colors } from '@/theme/colors'
 import { radius } from '@/theme/radius'
@@ -32,26 +33,21 @@ const INGREDIENTES: {
   key: string
   label: string
   unidad: string
-  precioBase: number
 }[] = [
-  { key: 'vienesas', label: 'Vienesas (pack x5)', unidad: 'pack', precioBase: 1750 },
-  { key: 'pan', label: 'Pan de completo (x8)', unidad: 'pack', precioBase: 1990 },
-  { key: 'palta', label: 'Palta Hass (1 kg)', unidad: 'malla', precioBase: 5500 },
-  { key: 'tomate', label: 'Tomate', unidad: 'kg', precioBase: 1990 },
-  { key: 'mayonesa', label: 'Mayonesa Kraft', unidad: 'frasco', precioBase: 6590 },
-  { key: 'mostaza', label: 'Mostaza', unidad: 'frasco', precioBase: 2090 },
-  { key: 'ketchup', label: 'Ketchup', unidad: 'frasco', precioBase: 2995 },
-  { key: 'chucrut', label: 'Chucrut', unidad: 'tarro', precioBase: 990 },
+  { key: 'vienesas', label: 'Vienesas (pack x5)', unidad: 'pack' },
+  { key: 'pan', label: 'Pan de completo (x8)', unidad: 'pack' },
+  { key: 'palta', label: 'Palta Hass (1 kg)', unidad: 'malla' },
+  { key: 'tomate', label: 'Tomate', unidad: 'kg' },
+  { key: 'mayonesa', label: 'Mayonesa Kraft', unidad: 'frasco' },
+  { key: 'mostaza', label: 'Mostaza', unidad: 'frasco' },
+  { key: 'ketchup', label: 'Ketchup', unidad: 'frasco' },
+  { key: 'chucrut', label: 'Chucrut', unidad: 'tarro' },
 ]
 
 const VISIBLES_POR_TIPO: Record<TipoCompleto, string[]> = {
   italiano: ['vienesas', 'pan', 'palta', 'tomate', 'mayonesa'],
   dinamico: ['vienesas', 'pan', 'chucrut', 'tomate', 'mayonesa', 'mostaza'],
   americano: ['vienesas', 'pan', 'ketchup', 'mostaza', 'mayonesa'],
-}
-
-function preciosBase(): Record<string, number> {
-  return Object.fromEntries(INGREDIENTES.map((i) => [i.key, i.precioBase]))
 }
 
 export default function PreciosScreen() {
@@ -65,7 +61,7 @@ export default function PreciosScreen() {
     duplicarId?: string
   }>()
 
-  const [precios, setPrecios] = useState<Record<string, number>>(preciosBase)
+  const [precios, setPrecios] = useState<Record<string, number>>(DEFAULT_PRICES)
   const [editingKey, setEditingKey] = useState<string | null>(null)
   const [editingRaw, setEditingRaw] = useState('')
   const [keyboardHeight, setKeyboardHeight] = useState(0)
@@ -88,8 +84,10 @@ export default function PreciosScreen() {
   useEffect(() => {
     if (duplicarId) {
       obtenerCompletada(duplicarId).then((c) => {
-        if (c?.precios) setPrecios({ ...preciosBase(), ...c.precios })
+        if (c?.precios) setPrecios({ ...DEFAULT_PRICES, ...c.precios })
       })
+    } else {
+      loadPrices().then(setPrecios)
     }
   }, [duplicarId])
 
@@ -124,7 +122,8 @@ export default function PreciosScreen() {
     })
   }
 
-  function handleCalcular() {
+  async function handleCalcular() {
+    await savePrices(precios)
     router.push({
       pathname: '/resumen',
       params: {

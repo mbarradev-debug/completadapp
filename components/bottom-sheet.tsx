@@ -28,6 +28,7 @@ const SPRING_CONFIG = { toValue: 0, bounciness: 4, useNativeDriver: true } as co
 export function BottomSheet({ visible, onClose, onVerResumen, onDuplicar }: BottomSheetProps) {
   const insets = useSafeAreaInsets()
   const slideAnim = useRef(new Animated.Value(SHEET_HEIGHT)).current
+  const overlayAnim = useRef(new Animated.Value(0)).current
 
   const onCloseRef = useRef(onClose)
   const onVerResumenRef = useRef(onVerResumen)
@@ -38,17 +39,20 @@ export function BottomSheet({ visible, onClose, onVerResumen, onDuplicar }: Bott
 
   useEffect(() => {
     if (visible) {
-      Animated.spring(slideAnim, SPRING_CONFIG).start()
+      Animated.parallel([
+        Animated.spring(slideAnim, SPRING_CONFIG),
+        Animated.timing(overlayAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+      ]).start()
     }
   }, [visible])
 
   function slideDown(callback: () => void) {
-    Animated.timing(slideAnim, {
-      toValue: SHEET_HEIGHT,
-      duration: 220,
-      useNativeDriver: true,
-    }).start(() => {
+    Animated.parallel([
+      Animated.timing(slideAnim, { toValue: SHEET_HEIGHT, duration: 220, useNativeDriver: true }),
+      Animated.timing(overlayAnim, { toValue: 0, duration: 220, useNativeDriver: true }),
+    ]).start(() => {
       slideAnim.setValue(SHEET_HEIGHT)
+      overlayAnim.setValue(0)
       callback()
     })
   }
@@ -57,7 +61,10 @@ export function BottomSheet({ visible, onClose, onVerResumen, onDuplicar }: Bott
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, { dy }) => dy > 5,
       onPanResponderMove: (_, { dy }) => {
-        if (dy > 0) slideAnim.setValue(dy)
+        if (dy > 0) {
+          slideAnim.setValue(dy)
+          overlayAnim.setValue(Math.max(0, 1 - dy / SHEET_HEIGHT))
+        }
       },
       onPanResponderRelease: (_, { dy, vy }) => {
         if (dy > 80 || vy > 0.5) {
@@ -77,7 +84,7 @@ export function BottomSheet({ visible, onClose, onVerResumen, onDuplicar }: Bott
       onRequestClose={() => slideDown(() => onCloseRef.current())}
     >
       <TouchableWithoutFeedback onPress={() => slideDown(() => onCloseRef.current())}>
-        <View style={styles.overlay} />
+        <Animated.View style={[styles.overlay, { opacity: overlayAnim }]} />
       </TouchableWithoutFeedback>
 
       <Animated.View

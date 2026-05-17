@@ -1,4 +1,4 @@
-import { Linking } from 'react-native'
+import { Alert, Linking } from 'react-native'
 import type { Completada, IngredientesCalculados } from '@/types'
 
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
@@ -40,7 +40,8 @@ function buildLineas(ingredientes: IngredientesCalculados): string[] {
 }
 
 export function generarMensajeWhatsApp(completada: Completada, modo: 'individual' | 'colaborativo'): string {
-  const { nombre, fecha, personas, completos, ingredientes, precios } = completada
+  const { fecha, personas, completos, ingredientes, precios } = completada
+  const nombre = completada.nombre.trim()
   const tipo = completos.italiano > 0 ? 'Italiano' : completos.dinamico > 0 ? 'Dinámico' : 'Americano'
   const costoTotal = calcularCostoTotal(ingredientes, precios)
   const costoPorPersona = Math.ceil(costoTotal / personas)
@@ -61,7 +62,19 @@ export function generarMensajeWhatsApp(completada: Completada, modo: 'individual
   ].join('\n')
 }
 
-export function compartirPorWhatsApp(completada: Completada, modo: 'individual' | 'colaborativo'): void {
+export async function compartirPorWhatsApp(completada: Completada, modo: 'individual' | 'colaborativo'): Promise<void> {
   const texto = generarMensajeWhatsApp(completada, modo)
-  Linking.openURL(`https://wa.me/?text=${encodeURIComponent(texto)}`)
+  const encoded = encodeURIComponent(texto)
+  const waUrl = `whatsapp://send?text=${encoded}`
+  const webUrl = `https://wa.me/?text=${encoded}`
+
+  try {
+    const canOpen = await Linking.canOpenURL(waUrl)
+    await Linking.openURL(canOpen ? waUrl : webUrl)
+  } catch {
+    Alert.alert(
+      'WhatsApp no disponible',
+      'Instalá WhatsApp para compartir la lista de compras.',
+    )
+  }
 }

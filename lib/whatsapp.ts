@@ -40,7 +40,8 @@ function buildLineas(ingredientes: IngredientesCalculados): string[] {
 }
 
 export function generarMensajeWhatsApp(completada: Completada, modo: 'individual' | 'colaborativo'): string {
-  const { nombre, fecha, personas, completos, ingredientes, precios } = completada
+  const { fecha, personas, completos, ingredientes, precios } = completada
+  const nombre = completada.nombre.trim()
   const tipo = completos.italiano > 0 ? 'Italiano' : completos.dinamico > 0 ? 'Dinámico' : 'Americano'
   const costoTotal = calcularCostoTotal(ingredientes, precios)
   const costoPorPersona = Math.ceil(costoTotal / personas)

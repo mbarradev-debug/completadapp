@@ -78,7 +78,7 @@ export default function NombreScreen() {
     router.push({
       pathname: '/nueva/personas',
       params: {
-        nombre,
+        nombre: nombre.trim(),
         fecha: fecha.toISOString(),
         ...(duplicarId ? { duplicarId } : {}),
       },

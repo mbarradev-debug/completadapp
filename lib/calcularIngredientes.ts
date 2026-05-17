@@ -73,10 +73,9 @@ export function calcularIngredientes(
   const americano = conMargen(escalado.americano)
   const totalCompletos = italiano + dinamico + americano
 
-  const gramsMayo =
-    italiano * MAYO_ITALIANO +
-    dinamico * MAYO_DINAMICO +
-    americano * MAYO_AMERICANO
+  const gramsMayo = Math.ceil(
+    (italiano * MAYO_ITALIANO + dinamico * MAYO_DINAMICO + americano * MAYO_AMERICANO) * 11 / 10
+  )
 
   const gramsMostaza = (dinamico + americano) * MOSTAZA_POR_COMPLETO
   const gramsTomate = (italiano + dinamico) * TOMATE_POR_COMPLETO

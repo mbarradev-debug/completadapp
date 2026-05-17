@@ -22,7 +22,7 @@ const TIPO_LABEL: Record<TipoCompleto, string> = {
 }
 
 function formatearFecha(fecha: string): string {
-  const [, mes, dia] = fecha.split('-').map(Number)
+  const [, mes, dia] = fecha.split('T')[0].split('-').map(Number)
   return `${dia} de ${MESES[mes - 1]}`
 }
 

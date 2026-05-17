@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
+  Animated,
   InputAccessoryView,
   Keyboard,
   Modal,
@@ -68,6 +69,7 @@ export default function PreciosScreen() {
   const [editingRaw, setEditingRaw] = useState('')
   const [keyboardHeight, setKeyboardHeight] = useState(0)
   const inputRef = useRef<TextInput>(null)
+  const slideAnim = useRef(new Animated.Value(500)).current
 
   useEffect(() => {
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow'
@@ -96,6 +98,7 @@ export default function PreciosScreen() {
   function openEdit(key: string) {
     setEditingKey(key)
     setEditingRaw(String(precios[key]))
+    Animated.spring(slideAnim, { toValue: 0, bounciness: 4, useNativeDriver: true }).start()
     setTimeout(() => inputRef.current?.focus(), 80)
   }
 
@@ -104,7 +107,10 @@ export default function PreciosScreen() {
     if (!isNaN(parsed) && parsed > 0 && editingKey) {
       setPrecios((p) => ({ ...p, [editingKey]: parsed }))
     }
-    setEditingKey(null)
+    Animated.timing(slideAnim, { toValue: 500, duration: 220, useNativeDriver: true }).start(() => {
+      slideAnim.setValue(500)
+      setEditingKey(null)
+    })
   }
 
   function handleCalcular() {
@@ -183,12 +189,12 @@ export default function PreciosScreen() {
       </View>
 
       {/* Edit modal */}
-      <Modal visible={editingKey !== null} transparent animationType="fade">
+      <Modal visible={editingKey !== null} transparent animationType="none">
         <TouchableWithoutFeedback onPress={confirmEdit}>
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
         <View style={[styles.editSheet, { bottom: Platform.OS === 'ios' ? keyboardHeight : 0 }]}>
-          <View style={styles.editCard}>
+          <Animated.View style={[styles.editCard, { transform: [{ translateY: slideAnim }] }]}>
             <Text variant="Heading/H4" style={styles.editTitle}>
               {editingIngrediente?.label}
             </Text>
@@ -209,7 +215,7 @@ export default function PreciosScreen() {
               <InputAccessoryView nativeID="precio-input" />
             )}
             <Button label="Listo" onPress={confirmEdit} />
-          </View>
+          </Animated.View>
         </View>
       </Modal>
     </View>

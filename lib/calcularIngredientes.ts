@@ -14,22 +14,22 @@ const GRAMOS_KETCHUP_FRASCO = 400
 const GRAMOS_CHUCRUT_TARRO = 400
 
 // Gramos por completo por tipo
-const MAYO_ITALIANO = 20
-const MAYO_DINAMICO = 15
-const MAYO_AMERICANO = 15
-const PALTA_POR_COMPLETO = 50
+const MAYO_ITALIANO = 50
+const MAYO_DINAMICO = 30
+const MAYO_AMERICANO = 25
+const PALTA_POR_COMPLETO = 70
 const TOMATE_POR_COMPLETO = 40
 const MOSTAZA_POR_COMPLETO = 10
 const KETCHUP_POR_COMPLETO = 20
 const CHUCRUT_POR_COMPLETO = 40
 
 function conMargen(n: number): number {
-  return Math.ceil(n * 1.1)
+  return Math.ceil(n * 11 / 10)
 }
 
 function aplicarMinimo(personas: number, completos: CompletosPorTipo): CompletosPorTipo {
   const total = completos.italiano + completos.dinamico + completos.americano
-  const minTotal = personas * 2
+  const minTotal = personas
   if (total >= minTotal) return completos
   if (total === 0) return { italiano: minTotal, dinamico: 0, americano: 0 }
   const factor = minTotal / total
@@ -53,7 +53,7 @@ function calcularMayonesa(
     return { formato: 'mediano', cantidad: 1, recomendarUpgrade }
   }
   if (grams <= GRAMOS_MAYO_GRANDE) {
-    return { formato: 'grande', cantidad: 1, recomendarUpgrade: false }
+    return { formato: 'grande', cantidad: 1, recomendarUpgrade }
   }
   return {
     formato: 'grande',
@@ -73,10 +73,9 @@ export function calcularIngredientes(
   const americano = conMargen(escalado.americano)
   const totalCompletos = italiano + dinamico + americano
 
-  const gramsMayo =
-    italiano * MAYO_ITALIANO +
-    dinamico * MAYO_DINAMICO +
-    americano * MAYO_AMERICANO
+  const gramsMayo = Math.ceil(
+    (italiano * MAYO_ITALIANO + dinamico * MAYO_DINAMICO + americano * MAYO_AMERICANO) * 11 / 10
+  )
 
   const gramsMostaza = (dinamico + americano) * MOSTAZA_POR_COMPLETO
   const gramsTomate = (italiano + dinamico) * TOMATE_POR_COMPLETO

@@ -28,7 +28,7 @@ const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto'
 
 function formatFecha(iso: string): string {
   const d = new Date(iso)
-  return `${d.getDate()} de ${MESES[d.getMonth()]}`
+  return `${d.getUTCDate()} de ${MESES[d.getUTCMonth()]}`
 }
 
 function formatCLP(n: number): string {

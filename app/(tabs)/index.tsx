@@ -1,15 +1,8 @@
-import { useCallback, useRef, useState } from 'react'
-import {
-  Animated,
-  FlatList,
-  Modal,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native'
+import { useCallback, useState } from 'react'
+import { FlatList, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFocusEffect, useRouter } from 'expo-router'
+import { BottomSheet } from '@/components/bottom-sheet'
 import { Button } from '@/components/button'
 import { CompletadaCard } from '@/components/completada-card'
 import { Text } from '@/components/text'
@@ -23,34 +16,12 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets()
   const [completadas, setCompletadas] = useState<Completada[]>([])
   const [selected, setSelected] = useState<Completada | null>(null)
-  const slideAnim = useRef(new Animated.Value(300)).current
 
   useFocusEffect(
     useCallback(() => {
       listarCompletadas().then(setCompletadas)
     }, []),
   )
-
-  function openSheet(completada: Completada) {
-    setSelected(completada)
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 280,
-      useNativeDriver: true,
-    }).start()
-  }
-
-  function closeSheet(callback?: () => void) {
-    Animated.timing(slideAnim, {
-      toValue: 300,
-      duration: 220,
-      useNativeDriver: true,
-    }).start(() => {
-      setSelected(null)
-      slideAnim.setValue(300)
-      callback?.()
-    })
-  }
 
   return (
     <View style={styles.container}>
@@ -72,7 +43,7 @@ export default function HomeScreen() {
             data={completadas}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <CompletadaCard completada={item} onPress={openSheet} />
+              <CompletadaCard completada={item} onPress={setSelected} />
             )}
             contentContainerStyle={styles.list}
             showsVerticalScrollIndicator={false}
@@ -88,57 +59,21 @@ export default function HomeScreen() {
         />
       </View>
 
-      {/* Bottom Sheet */}
-      <Modal
+      <BottomSheet
         visible={selected !== null}
-        transparent
-        animationType="none"
-        onRequestClose={() => closeSheet()}
-      >
-        <TouchableWithoutFeedback onPress={() => closeSheet()}>
-          <View style={styles.overlay} />
-        </TouchableWithoutFeedback>
-
-        <Animated.View
-          style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}
-        >
-          <View style={styles.dragHandle} />
-
-          <TouchableOpacity
-            style={styles.sheetRow}
-            activeOpacity={0.7}
-            onPress={() => closeSheet(() => router.push(`/resumen?id=${selected?.id}`))}
-          >
-            <Text variant="Body/Regular" style={styles.sheetRowText}>
-              Ver resumen
-            </Text>
-            <Text variant="Body/Regular" style={styles.chevron}>›</Text>
-          </TouchableOpacity>
-
-          <View style={styles.separator} />
-
-          <TouchableOpacity
-            style={styles.sheetRow}
-            activeOpacity={0.7}
-            onPress={() => closeSheet(() => router.push(`/nueva/nombre?duplicarId=${selected?.id}`))}
-          >
-            <Text variant="Body/Regular" style={styles.sheetRowText}>
-              Duplicar
-            </Text>
-            <Text variant="Body/Regular" style={styles.chevron}>›</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.cancelRow}
-            activeOpacity={0.7}
-            onPress={() => closeSheet()}
-          >
-            <Text variant="Action/Button" style={styles.cancelText}>
-              Cancelar
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
-      </Modal>
+        completada={selected}
+        onClose={() => setSelected(null)}
+        onVerResumen={() => {
+          const id = selected?.id
+          setSelected(null)
+          router.push(`/resumen?id=${id}`)
+        }}
+        onDuplicar={() => {
+          const id = selected?.id
+          setSelected(null)
+          router.push(`/nueva/nombre?duplicarId=${id}`)
+        }}
+      />
     </View>
   )
 }
@@ -215,55 +150,5 @@ const styles = StyleSheet.create({
   emptySubtitle: {
     color: colors.neutral.gray,
     textAlign: 'center',
-  },
-  // Bottom sheet
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(26,26,26,0.5)',
-  },
-  sheet: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 244,
-    backgroundColor: colors.neutral.cream,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingTop: spacing.md,
-    paddingHorizontal: spacing['2xl'],
-    paddingBottom: spacing['2xl'],
-  },
-  dragHandle: {
-    width: 40,
-    height: 4,
-    backgroundColor: colors.neutral.sand,
-    borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: spacing.lg,
-  },
-  sheetRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.lg,
-  },
-  sheetRowText: {
-    color: colors.neutral.carbon,
-  },
-  chevron: {
-    color: colors.neutral.gray,
-    fontSize: 20,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: colors.neutral.sand,
-  },
-  cancelRow: {
-    alignItems: 'center',
-    paddingTop: spacing.xl,
-  },
-  cancelText: {
-    color: colors.brand.red,
   },
 })

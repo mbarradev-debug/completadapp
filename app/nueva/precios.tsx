@@ -45,16 +45,15 @@ const INGREDIENTES_BASE: {
   key: string
   label: string
   unidad: string
-  precioBase: number
 }[] = [
-  { key: 'vienesas', label: 'Vienesas (pack x5)', unidad: 'pack', precioBase: 1750 },
-  { key: 'pan', label: 'Pan de completo (x8)', unidad: 'pack', precioBase: 1990 },
-  { key: 'palta', label: 'Palta Hass (1 kg)', unidad: 'malla', precioBase: 5500 },
-  { key: 'tomate', label: 'Tomate', unidad: 'kg', precioBase: 1990 },
-  { key: 'mayonesa', label: 'Mayonesa Kraft', unidad: 'frasco', precioBase: 6590 },
-  { key: 'mostaza', label: 'Mostaza', unidad: 'frasco', precioBase: 2090 },
-  { key: 'ketchup', label: 'Ketchup', unidad: 'frasco', precioBase: 2995 },
-  { key: 'chucrut', label: 'Chucrut', unidad: 'tarro', precioBase: 990 },
+  { key: 'vienesas', label: 'Vienesas (pack x5)', unidad: 'pack' },
+  { key: 'pan', label: 'Pan de completo (x8)', unidad: 'pack' },
+  { key: 'palta', label: 'Palta Hass (1 kg)', unidad: 'malla' },
+  { key: 'tomate', label: 'Tomate', unidad: 'kg' },
+  { key: 'mayonesa', label: 'Mayonesa Kraft', unidad: 'frasco' },
+  { key: 'mostaza', label: 'Mostaza', unidad: 'frasco' },
+  { key: 'ketchup', label: 'Ketchup', unidad: 'frasco' },
+  { key: 'chucrut', label: 'Chucrut', unidad: 'tarro' },
 ]
 
 const VISIBLES_POR_TIPO: Record<TipoCompleto, string[]> = {
@@ -121,6 +120,8 @@ export default function PreciosScreen() {
       obtenerCompletada(duplicarId).then((c) => {
         if (c?.precios) setPrecios({ ...preciosBase(formatoMayo), ...c.precios })
       })
+    } else {
+      loadPrices().then(setPrecios)
     }
   }, [duplicarId])
 
@@ -155,7 +156,8 @@ export default function PreciosScreen() {
     })
   }
 
-  function handleCalcular() {
+  async function handleCalcular() {
+    await savePrices(precios)
     router.push({
       pathname: '/resumen',
       params: {

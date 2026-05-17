@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { initializePrices } from '@/lib/defaultPrices';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,6 +26,10 @@ export default function RootLayout() {
     Pacifico_Regular: require('../assets/fonts/Pacifico_Regular.ttf'),
     SpecialElite_Regular: require('../assets/fonts/SpecialElite_Regular.ttf'),
   });
+
+  useEffect(() => {
+    initializePrices();
+  }, []);
 
   useEffect(() => {
     if (fontsLoaded) {

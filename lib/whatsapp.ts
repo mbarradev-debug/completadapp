@@ -5,7 +5,7 @@ const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto'
 
 function formatFecha(iso: string): string {
   const d = new Date(iso)
-  return `${d.getDate()} de ${MESES[d.getMonth()]}`
+  return `${d.getUTCDate()} de ${MESES[d.getUTCMonth()]}`
 }
 
 function formatCLP(n: number): string {
@@ -28,8 +28,8 @@ function calcularCostoTotal(ingredientes: IngredientesCalculados, precios: Recor
 function buildLineas(ingredientes: IngredientesCalculados): string[] {
   const { vienesas, pan, palta, tomate, mayonesa, mostaza, ketchup, chucrut } = ingredientes
   const ls: string[] = []
-  ls.push(`· Vienesas — ${vienesas.packsX5} packs x5`)
-  ls.push(`· Pan de completo — ${pan.packsX8} packs x8`)
+  ls.push(`· Vienesas — ${vienesas.packsX5} pack${vienesas.packsX5 !== 1 ? 's' : ''} x5`)
+  ls.push(`· Pan de completo — ${pan.packsX8} pack${pan.packsX8 !== 1 ? 's' : ''} x8`)
   if (palta.aplica) ls.push(`· Palta Hass — ${palta.mallas} malla${palta.mallas !== 1 ? 's' : ''} 1 kg`)
   if (tomate.aplica) ls.push(`· Tomate — ${tomate.unidades} unidad${tomate.unidades !== 1 ? 'es' : ''}`)
   ls.push(`· Mayonesa Kraft — ${mayonesa.cantidad} frasco ${mayonesa.formato}`)

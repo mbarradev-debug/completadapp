@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { FlatList, StyleSheet, View } from 'react-native'
+import { FlatList, Image, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { BottomSheet } from '@/components/bottom-sheet'
@@ -86,7 +86,11 @@ function EmptyState() {
   return (
     <View style={styles.emptyState}>
       <View style={styles.emptyIllustration}>
-        <Text style={styles.emptyEmoji}>🌭</Text>
+        <Image
+          source={require('@/assets/icons/icon-hotdog.png')}
+          style={styles.emptyImage}
+          resizeMode="contain"
+        />
       </View>
       <Text variant="Heading/H2" style={styles.emptyTitle}>
         ¡Todo listo para tu próxima completada!
@@ -142,9 +146,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emptyEmoji: {
-    fontSize: 72,
-    lineHeight: 86,
+  emptyImage: {
+    width: 120,
+    height: 120,
   },
   emptyTitle: {
     color: colors.neutral.carbon,

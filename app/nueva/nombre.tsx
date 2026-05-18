@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
+  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -142,7 +143,10 @@ export default function NombreScreen() {
             <Text variant="Body/Regular" style={styles.dateText}>
               {formatFecha(fecha)}
             </Text>
-            <Text style={styles.calendarIcon}>📅</Text>
+            <Image
+              source={require('@/assets/icons/icon-calendar.png')}
+              style={styles.calendarIcon}
+            />
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -285,7 +289,8 @@ const styles = StyleSheet.create({
     color: colors.neutral.carbon,
   },
   calendarIcon: {
-    fontSize: 18,
+    width: 20,
+    height: 20,
   },
   // Footer
   footer: {

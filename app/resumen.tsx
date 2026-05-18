@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Text } from '@/components/text'
@@ -139,9 +139,12 @@ export default function ResumenScreen() {
       >
         {/* Event info */}
         <Text variant="Heading/H2" style={styles.nombre}>{nombre}</Text>
-        <Text variant="Body/XSmall" style={styles.subtitulo}>
-          {`📅 ${formatFecha(fecha)}  ·  👥 ${personas} personas  ·  ${tipo}`}
-        </Text>
+        <View style={styles.subtituloRow}>
+          <Image source={require('@/assets/icons/icon-calendar.png')} style={styles.subtituloIcon} />
+          <Text variant="Body/XSmall" style={styles.subtitulo}>{` ${formatFecha(fecha)}  ·  `}</Text>
+          <Image source={require('@/assets/icons/icon-people.png')} style={styles.subtituloIcon} />
+          <Text variant="Body/XSmall" style={styles.subtitulo}>{` ${personas} personas  ·  ${tipo}`}</Text>
+        </View>
 
         {/* Stats card */}
         <View style={styles.statsCard}>
@@ -183,7 +186,10 @@ export default function ResumenScreen() {
         </View>
 
         {/* Shopping list */}
-        <Text variant="Heading/H4" style={styles.listaHeading}>{'🛒  Lista de compras'}</Text>
+        <View style={styles.listaHeadingRow}>
+          <Image source={require('@/assets/icons/icon-cart.png')} style={styles.listaHeadingIcon} />
+          <Text variant="Heading/H4" style={styles.listaHeading}>{'  Lista de compras'}</Text>
+        </View>
         <View style={styles.listaCard}>
           {items.map((item, i) => (
             <View key={item.label}>
@@ -260,10 +266,18 @@ const styles = StyleSheet.create({
   nombre: {
     color: colors.neutral.carbon,
   },
-  subtitulo: {
-    color: colors.neutral.gray,
+  subtituloRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
+  },
+  subtituloIcon: {
+    width: 14,
+    height: 14,
+  },
+  subtitulo: {
+    color: colors.neutral.gray,
   },
   // Stats card
   statsCard: {
@@ -331,9 +345,17 @@ const styles = StyleSheet.create({
     color: colors.neutral.gray,
   },
   // Shopping list
+  listaHeadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  listaHeadingIcon: {
+    width: 20,
+    height: 20,
+  },
   listaHeading: {
     color: colors.neutral.carbon,
-    marginBottom: spacing.md,
   },
   listaCard: {
     backgroundColor: colors.neutral.white,

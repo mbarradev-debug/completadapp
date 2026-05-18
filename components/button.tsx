@@ -24,6 +24,10 @@ export function Button({ label, onPress, disabled = false, variant = 'primary', 
       <Text
         variant="Action/Button"
         style={[styles.label, !isPrimary && styles.labelSecondary]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}
+        allowFontScaling={false}
       >
         {label}
       </Text>

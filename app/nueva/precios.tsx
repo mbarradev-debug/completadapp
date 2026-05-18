@@ -233,12 +233,14 @@ export default function PreciosScreen() {
           ))}
         </View>
 
-        <View style={styles.infoPill}>
-          <Text style={styles.infoPillText}>
-            ⚠ Precios referenciales. Actualiza los que difieran en tu zona.
-          </Text>
-        </View>
       </ScrollView>
+
+      {/* InfoPill — anclado, siempre visible sobre el footer */}
+      <View style={styles.infoPill}>
+        <Text style={styles.infoPillText}>
+          ⚠ Precios referenciales. Actualiza los que difieran en tu zona.
+        </Text>
+      </View>
 
       {/* Footer */}
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.xl) }]}>
@@ -382,13 +384,15 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: colors.accent.mustardText,
   },
-  // Info pill
+  // Info pill — anclado fuera del scroll
   infoPill: {
     backgroundColor: colors.neutral.sandLight,
     borderWidth: 1,
     borderColor: colors.neutral.sand,
     borderRadius: radius.md,
     padding: spacing.md,
+    marginHorizontal: spacing['2xl'],
+    marginVertical: spacing.md,
   },
   infoPillText: {
     fontFamily: 'DMSans_Regular',

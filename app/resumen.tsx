@@ -218,7 +218,14 @@ export default function ResumenScreen() {
           onPress={() => void compartirPorWhatsApp(completada, modo)}
           activeOpacity={0.85}
         >
-          <Text style={styles.waButtonLabel}>Compartir por WhatsApp</Text>
+          <Text
+            style={styles.waButtonLabel}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
+          >
+            Compartir por WhatsApp
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

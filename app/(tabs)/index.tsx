@@ -117,6 +117,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     color: colors.neutral.white,
+    lineHeight: 40,
   },
   content: {
     flex: 1,

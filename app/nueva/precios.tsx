@@ -102,26 +102,21 @@ export default function PreciosScreen() {
   const bottomAnim = useRef(new Animated.Value(0)).current
 
   useEffect(() => {
-    const show = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-      (e) => {
-        Animated.timing(bottomAnim, {
-          toValue: e.endCoordinates.height,
-          duration: Platform.OS === 'ios' ? (e.duration ?? 250) : 0,
-          useNativeDriver: false,
-        }).start()
-      },
-    )
-    const hide = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-      (e) => {
-        Animated.timing(bottomAnim, {
-          toValue: 0,
-          duration: Platform.OS === 'ios' ? (e.duration ?? 250) : 0,
-          useNativeDriver: false,
-        }).start()
-      },
-    )
+    if (Platform.OS !== 'ios') return
+    const show = Keyboard.addListener('keyboardWillShow', (e) => {
+      Animated.timing(bottomAnim, {
+        toValue: e.endCoordinates.height,
+        duration: e.duration ?? 250,
+        useNativeDriver: false,
+      }).start()
+    })
+    const hide = Keyboard.addListener('keyboardWillHide', (e) => {
+      Animated.timing(bottomAnim, {
+        toValue: 0,
+        duration: e.duration ?? 250,
+        useNativeDriver: false,
+      }).start()
+    })
     return () => {
       show.remove()
       hide.remove()

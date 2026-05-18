@@ -53,8 +53,8 @@ type ItemLista = { label: string; cantidad: string }
 function buildLista(ingredientes: IngredientesCalculados): ItemLista[] {
   const { vienesas, pan, palta, tomate, mayonesa, mostaza, ketchup, chucrut } = ingredientes
   const items: ItemLista[] = []
-  items.push({ label: 'Vienesas', cantidad: `${vienesas.packsX5} packs x5` })
-  items.push({ label: 'Pan de completo', cantidad: `${pan.packsX8} packs x8` })
+  items.push({ label: 'Vienesas', cantidad: `${vienesas.packsX5} pack${vienesas.packsX5 !== 1 ? 's' : ''} x5` })
+  items.push({ label: 'Pan de completo', cantidad: `${pan.packsX8} pack${pan.packsX8 !== 1 ? 's' : ''} x8` })
   if (palta.aplica) items.push({ label: 'Palta Hass', cantidad: `${palta.mallas} malla${palta.mallas !== 1 ? 's' : ''} 1 kg` })
   if (tomate.aplica) items.push({ label: 'Tomate', cantidad: `${tomate.unidades} unidad${tomate.unidades !== 1 ? 'es' : ''}` })
   items.push({ label: 'Mayonesa Kraft', cantidad: `${mayonesa.cantidad} frasco ${mayonesa.formato}` })
@@ -143,7 +143,7 @@ export default function ResumenScreen() {
           <Image source={require('@/assets/icons/icon-calendar.png')} style={styles.subtituloIcon} />
           <Text variant="Body/XSmall" style={styles.subtitulo}>{` ${formatFecha(fecha)}  ·  `}</Text>
           <Image source={require('@/assets/icons/icon-people.png')} style={styles.subtituloIcon} />
-          <Text variant="Body/XSmall" style={styles.subtitulo}>{` ${personas} personas  ·  ${tipo}`}</Text>
+          <Text variant="Body/XSmall" style={styles.subtitulo}>{` ${personas} persona${personas !== 1 ? 's' : ''}  ·  ${tipo}`}</Text>
         </View>
 
         {/* Stats card */}
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   listaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 48,
+    minHeight: 48,
     gap: spacing.sm,
   },
   dot: {
@@ -384,12 +384,14 @@ const styles = StyleSheet.create({
   },
   itemLabel: {
     flex: 1,
+    flexShrink: 1,
     fontFamily: 'DMSans_Medium',
     fontSize: 15,
     lineHeight: 21,
     color: colors.neutral.carbon,
   },
   itemCantidad: {
+    flexShrink: 0,
     fontFamily: 'DMSans_Regular',
     fontSize: 13,
     lineHeight: 18,

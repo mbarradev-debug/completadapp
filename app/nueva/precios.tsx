@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  useWindowDimensions,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
@@ -86,6 +87,7 @@ export default function PreciosScreen() {
     duplicarId?: string
   }>()
 
+  const { height: windowHeight } = useWindowDimensions()
   const personasNum = parseInt(personas || '1', 10)
   const formatoMayo = resolverFormatoMayo(personasNum, tipo)
   const ingredientes = INGREDIENTES_BASE.map((i) =>
@@ -219,7 +221,7 @@ export default function PreciosScreen() {
           {filas.map(({ key, label, unidad }) => (
             <View key={key} style={styles.fila}>
               <View style={styles.filaTextos}>
-                <Text style={styles.filaLabel}>{label}</Text>
+                <Text style={styles.filaLabel} numberOfLines={2}>{label}</Text>
                 <Text style={styles.filaUnidad}>{unidad}</Text>
               </View>
               <TouchableOpacity
@@ -253,7 +255,7 @@ export default function PreciosScreen() {
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
         <Animated.View style={[styles.editSheet, { bottom: bottomAnim }]}>
-          <Animated.View style={[styles.editCard, { transform: [{ translateY: slideAnim }] }]}>
+          <Animated.View style={[styles.editCard, { transform: [{ translateY: slideAnim }], maxHeight: windowHeight * 0.55 }]}>
             <Text variant="Heading/H4" style={styles.editTitle}>
               {editingIngrediente?.label}
             </Text>
@@ -346,6 +348,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
@@ -356,6 +359,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexShrink: 1,
     gap: 2,
+    marginRight: spacing.sm,
   },
   filaLabel: {
     fontFamily: 'DMSans_Medium',
@@ -371,7 +375,8 @@ const styles = StyleSheet.create({
   },
   badge: {
     height: 34,
-    minWidth: 88,
+    minWidth: 80,
+    flexShrink: 0,
     paddingHorizontal: spacing.md,
     borderRadius: radius.sm,
     borderWidth: 1.5,

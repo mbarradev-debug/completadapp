@@ -114,9 +114,11 @@ const styles = StyleSheet.create({
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'visible',
   },
   logo: {
     color: colors.neutral.white,
+    lineHeight: 40,
   },
   content: {
     flex: 1,

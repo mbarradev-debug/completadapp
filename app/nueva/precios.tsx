@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   fila: {
-    height: 58,
+    minHeight: 58,
     backgroundColor: colors.neutral.white,
     borderWidth: 1,
     borderColor: colors.neutral.sand,
@@ -353,6 +353,8 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   filaTextos: {
+    flex: 1,
+    flexShrink: 1,
     gap: 2,
   },
   filaLabel: {

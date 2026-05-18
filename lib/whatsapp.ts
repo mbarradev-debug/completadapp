@@ -64,13 +64,10 @@ export function generarMensajeWhatsApp(completada: Completada, modo: 'individual
 
 export async function compartirPorWhatsApp(completada: Completada, modo: 'individual' | 'colaborativo'): Promise<void> {
   const texto = generarMensajeWhatsApp(completada, modo)
-  const encoded = encodeURIComponent(texto)
-  const waUrl = `whatsapp://send?text=${encoded}`
-  const webUrl = `https://wa.me/?text=${encoded}`
+  const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
 
   try {
-    const canOpen = await Linking.canOpenURL(waUrl)
-    await Linking.openURL(canOpen ? waUrl : webUrl)
+    await Linking.openURL(url)
   } catch {
     Alert.alert(
       'WhatsApp no disponible',

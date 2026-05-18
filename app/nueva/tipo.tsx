@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Image, ImageSourcePropType, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Image, ImageSourcePropType, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { ProgressStepper } from '@/components/progress-stepper'
@@ -44,6 +44,9 @@ export default function TipoScreen() {
     personas: string
     duplicarId?: string
   }>()
+
+  const { width } = useWindowDimensions()
+  const isNarrow = width < 390
 
   const [preseleccionado, setPreseleccionado] = useState<TipoCompleto | null>(null)
 
@@ -103,11 +106,15 @@ export default function TipoScreen() {
             return (
               <TouchableOpacity
                 key={tipo}
-                style={[styles.card, seleccionado ? styles.cardSelected : styles.cardDefault]}
+                style={[
+                  styles.card,
+                  isNarrow ? styles.cardNarrow : styles.cardNormal,
+                  seleccionado ? styles.cardSelected : styles.cardDefault,
+                ]}
                 onPress={() => handleSeleccionar(tipo)}
                 activeOpacity={0.85}
               >
-                <Image source={imagen} style={styles.imagen} />
+                <Image source={imagen} style={isNarrow ? styles.imagenSmall : styles.imagen} />
                 <View style={styles.textos}>
                   <Text
                     variant="Heading/H3-Nav"
@@ -184,12 +191,18 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
   },
   card: {
-    height: 104,
     borderRadius: CARD_RADIUS,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     gap: spacing.lg,
+  },
+  cardNormal: {
+    height: 104,
+  },
+  cardNarrow: {
+    minHeight: 88,
+    paddingVertical: spacing.md,
   },
   cardDefault: {
     backgroundColor: colors.neutral.white,
@@ -214,6 +227,10 @@ const styles = StyleSheet.create({
   imagen: {
     width: 72,
     height: 72,
+  },
+  imagenSmall: {
+    width: 60,
+    height: 60,
   },
   textos: {
     flex: 1,

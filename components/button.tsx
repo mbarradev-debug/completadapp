@@ -27,7 +27,6 @@ export function Button({ label, onPress, disabled = false, variant = 'primary', 
         numberOfLines={1}
         adjustsFontSizeToFit
         minimumFontScale={0.8}
-        allowFontScaling={false}
       >
         {label}
       </Text>

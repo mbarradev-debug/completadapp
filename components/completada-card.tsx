@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity } from 'react-native'
+import { StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native'
 import { Text } from '@/components/text'
 import { colors } from '@/theme/colors'
 import { radius } from '@/theme/radius'
@@ -35,6 +35,8 @@ function getTipoLabel(completos: Completada['completos']): string {
 
 export function CompletadaCard({ completada, onPress }: CompletadaCardProps) {
   const tipo = getTipoLabel(completada.completos)
+  const { width } = useWindowDimensions()
+  const isNarrow = width < 375
 
   return (
     <TouchableOpacity
@@ -42,14 +44,14 @@ export function CompletadaCard({ completada, onPress }: CompletadaCardProps) {
       onPress={() => onPress(completada)}
       activeOpacity={0.85}
     >
-      <Text variant="Heading/H4" style={styles.nombre}>
+      <Text variant="Heading/H4" style={[styles.nombre, isNarrow && styles.nombreNarrow]}>
         {completada.nombre}
       </Text>
-      <Text variant="Body/Small" style={styles.fecha}>
+      <Text variant="Body/Small" style={[styles.fecha, isNarrow && styles.fechaNarrow]}>
         {formatearFecha(completada.fecha)}
       </Text>
-      <Text variant="Body/Caption" style={styles.meta}>
-        {tipo} · {completada.personas} personas
+      <Text variant="Body/Caption" style={[styles.meta, isNarrow && styles.metaNarrow]}>
+        {tipo} · {completada.personas} {completada.personas !== 1 ? 'personas' : 'persona'}
       </Text>
     </TouchableOpacity>
   )
@@ -57,7 +59,7 @@ export function CompletadaCard({ completada, onPress }: CompletadaCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.neutral.white,
+    backgroundColor: colors.neutral.cream,
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.neutral.sand,
@@ -67,10 +69,19 @@ const styles = StyleSheet.create({
   nombre: {
     color: colors.neutral.carbon,
   },
+  nombreNarrow: {
+    fontSize: 14,
+  },
   fecha: {
     color: colors.neutral.gray,
   },
+  fechaNarrow: {
+    fontSize: 13,
+  },
   meta: {
     color: colors.neutral.grayLight,
+  },
+  metaNarrow: {
+    fontSize: 11,
   },
 })

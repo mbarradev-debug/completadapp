@@ -147,8 +147,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyImage: {
-    width: 120,
-    height: 120,
+    width: 150,
+    height: 150,
   },
   emptyTitle: {
     color: colors.neutral.carbon,

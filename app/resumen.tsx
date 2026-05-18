@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Text } from '@/components/text'
@@ -78,6 +79,8 @@ export default function ResumenScreen() {
 
   const [completada, setCompletada] = useState<Completada | null>(null)
   const [modo, setModo] = useState<'individual' | 'colaborativo'>('individual')
+  const [showFade, setShowFade] = useState(false)
+  const scrollWrapperHeight = useRef(0)
 
   useEffect(() => {
     if (params.id) {
@@ -130,12 +133,22 @@ export default function ResumenScreen() {
         </View>
       </View>
 
+      <View
+        style={styles.scrollWrapper}
+        onLayout={(e) => { scrollWrapperHeight.current = e.nativeEvent.layout.height }}
+      >
       <ScrollView
         contentContainerStyle={[
           styles.scroll,
           { paddingBottom: 92 + Math.max(insets.bottom, spacing.xl) },
         ]}
         showsVerticalScrollIndicator={false}
+        scrollEventThrottle={32}
+        onContentSizeChange={(_, h) => setShowFade(h > scrollWrapperHeight.current + 4)}
+        onScroll={(e) => {
+          const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent
+          setShowFade(contentOffset.y + layoutMeasurement.height < contentSize.height - 16)
+        }}
       >
         {/* Event info */}
         <Text variant="Heading/H2" style={styles.nombre}>{nombre}</Text>
@@ -210,6 +223,14 @@ export default function ResumenScreen() {
           <Text style={styles.waPreviewLine}>{preview2}</Text>
         </View>
       </ScrollView>
+      {showFade && (
+        <LinearGradient
+          colors={['rgba(255,248,232,0)', colors.neutral.cream]}
+          style={styles.scrollFade}
+          pointerEvents="none"
+        />
+      )}
+      </View>
 
       {/* Footer — always visible */}
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.xl) }]}>
@@ -265,9 +286,19 @@ const styles = StyleSheet.create({
     width: 32,
   },
   // Scroll
+  scrollWrapper: {
+    flex: 1,
+  },
   scroll: {
     paddingHorizontal: spacing['2xl'],
     paddingTop: spacing.xl,
+  },
+  scrollFade: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 80,
   },
   // Event info
   nombre: {

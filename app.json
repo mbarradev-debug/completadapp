@@ -17,7 +17,8 @@
         "backgroundColor": "#C1272D"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.completadapp"
     },
     "web": {
       "output": "static",
@@ -28,10 +29,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 600,
-          "resizeMode": "contain",
-          "backgroundColor": "#FFF8E8"
+          "backgroundColor": "#C1272D"
         }
       ]
     ],

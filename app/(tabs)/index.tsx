@@ -1,6 +1,7 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FlatList, Image, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Asset } from 'expo-asset'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { BottomSheet } from '@/components/bottom-sheet'
 import { Button } from '@/components/button'
@@ -16,6 +17,14 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets()
   const [completadas, setCompletadas] = useState<Completada[]>([])
   const [selected, setSelected] = useState<Completada | null>(null)
+
+  useEffect(() => {
+    Asset.loadAsync([
+      require('@/assets/images/completos/italiano.png'),
+      require('@/assets/images/completos/dinamico.png'),
+      require('@/assets/images/completos/americano.png'),
+    ])
+  }, [])
 
   useFocusEffect(
     useCallback(() => {

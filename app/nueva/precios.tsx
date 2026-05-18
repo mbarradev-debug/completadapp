@@ -14,6 +14,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Button } from '@/components/button'
@@ -95,6 +96,9 @@ export default function PreciosScreen() {
       ? { ...i, label: MAYO_LABELS[formatoMayo], precioBase: MAYO_PRECIOS[formatoMayo] }
       : i
   )
+
+  const [showFade, setShowFade] = useState(false)
+  const scrollWrapperHeight = useRef(0)
 
   const [precios, setPrecios] = useState<Record<string, number>>(() => preciosBase(formatoMayo))
   const [editingKey, setEditingKey] = useState<string | null>(null)
@@ -201,41 +205,59 @@ export default function PreciosScreen() {
         </View>
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+      <View
+        style={styles.scrollWrapper}
+        onLayout={(e) => { scrollWrapperHeight.current = e.nativeEvent.layout.height }}
       >
-        <View style={styles.stepperRow}>
-          <ProgressStepper total={4} current={4} />
-        </View>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          scrollEventThrottle={32}
+          onContentSizeChange={(_, h) => setShowFade(h > scrollWrapperHeight.current + 4)}
+          onScroll={(e) => {
+            const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent
+            setShowFade(contentOffset.y + layoutMeasurement.height < contentSize.height - 16)
+          }}
+        >
+          <View style={styles.stepperRow}>
+            <ProgressStepper total={4} current={4} />
+          </View>
 
-        <Text variant="Heading/H1" style={styles.heading}>
-          {'Precios de\nreferencia'}
-        </Text>
-        <Text variant="Body/Small" style={styles.subtext}>
-          Tócalos para editarlos según tu supermercado.
-        </Text>
+          <Text variant="Heading/H1" style={styles.heading}>
+            {'Precios de\nreferencia'}
+          </Text>
+          <Text variant="Body/Small" style={styles.subtext}>
+            Tócalos para editarlos según tu supermercado.
+          </Text>
 
-        <View style={styles.filas}>
-          {filas.map(({ key, label, unidad }) => (
-            <View key={key} style={styles.fila}>
-              <View style={styles.filaTextos}>
-                <Text style={styles.filaLabel} numberOfLines={2}>{label}</Text>
-                <Text style={styles.filaUnidad}>{unidad}</Text>
+          <View style={styles.filas}>
+            {filas.map(({ key, label, unidad }) => (
+              <View key={key} style={styles.fila}>
+                <View style={styles.filaTextos}>
+                  <Text style={styles.filaLabel} numberOfLines={2}>{label}</Text>
+                  <Text style={styles.filaUnidad}>{unidad}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.badge}
+                  onPress={() => openEdit(key)}
+                  activeOpacity={0.75}
+                >
+                  <Text style={styles.badgeText}>{formatCLP(precios[key] ?? 0)}</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                style={styles.badge}
-                onPress={() => openEdit(key)}
-                activeOpacity={0.75}
-              >
-                <Text style={styles.badgeText}>{formatCLP(precios[key] ?? 0)}</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
+            ))}
+          </View>
 
-      </ScrollView>
+        </ScrollView>
+        {showFade && (
+          <LinearGradient
+            colors={['rgba(255,248,232,0)', colors.neutral.cream]}
+            style={styles.scrollFade}
+            pointerEvents="none"
+          />
+        )}
+      </View>
 
       {/* InfoPill — anclado, siempre visible sobre el footer */}
       <View style={styles.infoPill}>
@@ -316,9 +338,19 @@ const styles = StyleSheet.create({
     width: 32,
   },
   // Scroll
+  scrollWrapper: {
+    flex: 1,
+  },
   scroll: {
     paddingHorizontal: spacing['2xl'],
     paddingBottom: spacing['2xl'],
+  },
+  scrollFade: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 64,
   },
   stepperRow: {
     alignItems: 'center',

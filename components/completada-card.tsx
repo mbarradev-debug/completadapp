@@ -49,7 +49,7 @@ export function CompletadaCard({ completada, onPress }: CompletadaCardProps) {
         {formatearFecha(completada.fecha)}
       </Text>
       <Text variant="Body/Caption" style={styles.meta}>
-        {tipo} · {completada.personas} personas
+        {tipo} · {completada.personas} {completada.personas !== 1 ? 'personas' : 'persona'}
       </Text>
     </TouchableOpacity>
   )
@@ -57,7 +57,7 @@ export function CompletadaCard({ completada, onPress }: CompletadaCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.neutral.white,
+    backgroundColor: colors.neutral.cream,
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.neutral.sand,

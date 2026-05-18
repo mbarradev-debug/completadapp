@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   Image,
-  KeyboardAvoidingView,
+  Keyboard,
   Modal,
   Platform,
   ScrollView,
@@ -39,6 +39,15 @@ export default function NombreScreen() {
   const [nombreFocused, setNombreFocused] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
   const [tempFecha, setTempFecha] = useState(new Date())
+  const [kbHeight, setKbHeight] = useState(0)
+
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow'
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide'
+    const show = Keyboard.addListener(showEvent, (e) => setKbHeight(e.endCoordinates.height))
+    const hide = Keyboard.addListener(hideEvent, () => setKbHeight(0))
+    return () => { show.remove(); hide.remove() }
+  }, [])
 
   useEffect(() => {
     if (duplicarId) {
@@ -87,10 +96,7 @@ export default function NombreScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.root}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <View style={styles.root}>
       {/* Navbar */}
       <View style={[styles.navbar, { paddingTop: insets.top }]}>
         <View style={styles.navbarContent}>
@@ -152,7 +158,7 @@ export default function NombreScreen() {
       </ScrollView>
 
       {/* Footer */}
-      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.xl) }]}>
+      <View style={[styles.footer, { paddingBottom: kbHeight > 0 ? kbHeight + spacing.lg : Math.max(insets.bottom, spacing.xl) }]}>
         <Button
           label="Continuar →"
           onPress={handleContinuar}
@@ -195,7 +201,7 @@ export default function NombreScreen() {
           <Button label="Listo" onPress={confirmPicker} />
         </View>
       </Modal>
-    </KeyboardAvoidingView>
+    </View>
   )
 }
 

@@ -47,12 +47,16 @@ export default function HomeScreen() {
             )}
             contentContainerStyle={styles.list}
             showsVerticalScrollIndicator={false}
+            removeClippedSubviews
+            maxToRenderPerBatch={10}
+            windowSize={5}
+            initialNumToRender={10}
           />
         )}
       </View>
 
       {/* Footer CTA */}
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing['2xl']) }]}>
         <Button
           label="+ Nueva completada"
           onPress={() => router.push('/nueva/nombre')}
@@ -119,7 +123,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingHorizontal: spacing['2xl'],
-    paddingBottom: spacing['2xl'],
     paddingTop: spacing.lg,
     backgroundColor: colors.neutral.cream,
   },

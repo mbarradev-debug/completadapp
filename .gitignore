@@ -41,3 +41,6 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Play Store assets (local only, no subir a GitHub)
+/play-store

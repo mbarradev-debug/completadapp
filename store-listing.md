@@ -55,4 +55,4 @@ Organiza mejor. Compra justo lo necesario. Nadie paga de más.
 |---|---|---|
 | Ícono 512×512 PNG | `assets/images/icon-playstore.png` | ✅ |
 | Feature graphic 1024×500 | Exportar desde Figma (frame "Feature Graphic — Play Store") | ✅ |
-| Screenshots | Capturar desde dispositivo | ⏳ |
+| Screenshots (x6) | Capturar desde dispositivo | ✅ |
